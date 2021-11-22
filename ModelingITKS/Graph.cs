@@ -39,6 +39,7 @@ namespace GraphLabs
         public int QueueSize;
         public List<Message> Queue;
         public int timeSpawn;
+        public Dictionary<int, int> QueueMap;
 
         public int max;
 
@@ -54,19 +55,29 @@ namespace GraphLabs
             this.timeSpawn = timeSpawn;
             Target = new List<int>();
             Queue = new List<Message>(QueueSize);
+            QueueMap = new Dictionary<int, int>();
         }
 
         public void AddMessage(Message message)
         {
             if (Queue.Count != QueueSize)
             {
-                Console.WriteLine($"Router { NumberRouter} add message { message.TimeOfProcessing :F6}, to { message.NumberRouter}");
+                Console.WriteLine($"Router { NumberRouter} add message { message.TimeOfProcessing:F6}, to { message.NumberRouter}");
                 Queue.Add(message);
             }
             else
             {
+                var first = Queue.First();
+                if (first.Priority < message.Priority)
+                {
+                    Queue.RemoveAt(0);
+                    Console.WriteLine($"Queue is full. Router { NumberRouter} add message { message.TimeOfProcessing:F6}, to { message.NumberRouter}, delete last queue message { first.Priority} < { message.Priority}");
+                    Queue.Add(message);
+                }
+
                 Routing.CountLoseMessage++;
             }
+            Queue = Queue.OrderBy(x => x.Priority).ToList();
         }
 
         public void AddTarget(int router)
@@ -86,25 +97,53 @@ namespace GraphLabs
                     AddMessage(new Message
                     {
                         NumberRouter = rnd.Next(0, max),
+                        Priority = rnd.Next(1, 10),
                     });
                     await Task.Delay(TimeSpan.FromSeconds(timeSpawn));
                 }
             });
         }
 
-        public int WayTo(int numberRouter)
+        public void GenerateWay(List<RouterM> routerMs)
         {
+            QueueMap.Add(NumberRouter, NumberRouter);
             foreach (var item in Target)
             {
-                if (numberRouter== item)
+                QueueMap.Add(item, item);
+                if (Target.Count == 1)
                 {
-                    return item;
+                    foreach (var item2 in Enumerable.Range(0, max))
+                    {
+                        QueueMap.TryAdd(item2, item);
+                    }
+                    return;
                 }
             }
+            bool twice = false;
+            while (QueueMap.Count != max)
+            {
+                var range = new Dictionary<int, int>(QueueMap);
+                foreach (var item in range)
+                {
+                    if (item.Key == NumberRouter)
+                    {
+                        continue;
+                    }
+                    foreach (var tar in routerMs[item.Key].Target)
+                    {
+                        if (!QueueMap.ContainsKey(tar))
+                        {
+                            if (twice)
+                                QueueMap.TryAdd(tar, item.Value);
+                            else
+                                QueueMap.TryAdd(tar, item.Key);
 
+                        }
+                    }
 
-
-            return default;
+                }
+                twice = true;
+            }
         }
 
         public override string ToString()
@@ -115,15 +154,10 @@ namespace GraphLabs
 
     public class Message
     {
-        public int NumberRouter;
-        public double TimeOfProcessing;
-        public bool IsDown;
+        public int NumberRouter { get; set; }
+        public double TimeOfProcessing { get; set; }
+        public bool IsDown { get; set; }
+        public int Priority { get; set; }
     }
 
-    public class WayClass
-    {
-        public int Amount;
-        public List<int> TimeOfProcessing;
-        public bool IsDown;
-    }
 }

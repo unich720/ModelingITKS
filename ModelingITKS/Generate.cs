@@ -355,7 +355,7 @@ namespace GraphLabs
             List<RouterM> Routers = new List<RouterM>();
             for (int i = 0; i < max; i++)
             {
-                RouterM routerM = new RouterM(i, rnd.Next(1, 5), rnd.Next(1, 5), max, rnd.Next(5, 10));
+                RouterM routerM = new RouterM(i, rnd.Next(1, 5), rnd.Next(1, 10), max, rnd.Next(3, 8));
                 Routers.Add(routerM);
             }
 

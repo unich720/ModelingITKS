@@ -61,13 +61,15 @@ namespace ModelingITKS
             this.routerMs = routerMs;
             routers = new List<Task>();
 
-            routerMs.First().GenerateMessage(_cancellationTokenSource.Token);
-            routers.Add(Task.Run(() => ProcesRandom(routerMs.First(), _cancellationTokenSource.Token)));
-            //foreach (var item in routerMs)
-            //{
-            //    item.GenerateMessage(_cancellationTokenSource.Token);
-            //    routers.Add(Task.Run(() => ProcesRandom(item, _cancellationTokenSource.Token)));
-            //}
+            //routerMs.First().GenerateMessage(_cancellationTokenSource.Token);
+            //routerMs.First().GenerateWay(routerMs);
+            //routers.Add(Task.Run(() => ProcesRandom(routerMs.First(), _cancellationTokenSource.Token)));
+            foreach (var item in routerMs)
+            {
+                item.GenerateWay(routerMs);
+                item.GenerateMessage(_cancellationTokenSource.Token);
+                routers.Add(Task.Run(() => ProcesRandom(item, _cancellationTokenSource.Token)));
+            }
             Info(_cancellationTokenSource.Token);
         }
 
@@ -217,7 +219,7 @@ namespace ModelingITKS
                     var message = routerM.Queue.First();
                     if (message != null)
                     {
-                        Console.WriteLine($"Router {routerM.NumberRouter} start message timeOfProcessing {message.TimeOfProcessing:F6}, to {message.NumberRouter}");
+                        //Console.WriteLine($"Router {routerM.NumberRouter} start message timeOfProcessing {message.TimeOfProcessing:F6}, to {message.NumberRouter}");
                         if (routerM.NumberRouter == message.NumberRouter)
                         {
                             TimeMessageTrue += message.TimeOfProcessing;
@@ -230,88 +232,11 @@ namespace ModelingITKS
                         else
                         {
                             //передача пакета другому
-                            int newtRouterM = 0;
-                            List<int> used = new List<int>();
-                            List<int> notused = new List<int>();
-
-                            foreach (var router in routerM.Target)
-                            {
-                                if (message.NumberRouter == router)
-                                {
-                                    newtRouterM = router;
-                                }
-                                else
-                                {
-                                    used.Add(router);
-                                }
-                            }
-                            int put = 1;
-                            Dictionary<int,Dictionary<int,List<(int, int)>>> way = new();
-                            while (newtRouterM == 0)
-                            {
-                                var used2 = new List<int>(used);
-                                Dictionary<int, List<(int, int)>> dasd = new();
-                                foreach (var item in used2)
-                                {
-                                    List<(int, int)> sad = new();
-                                    foreach (var item2 in routerMs[item].Target)
-                                    {
-                                        if (message.NumberRouter == item2)
-                                        {
-                                            newtRouterM = item;
-                                            sad.Add((item, item2));
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            //sad.Add(item2);
-                                            used.Add(item2);
-                                        }
-
-                                        sad.Add((item, item2));
-                                    }
-                                    dasd.Add(item, sad);
-                                    used.Remove(item);
-                                    if (newtRouterM != 0)
-                                    {
-                                        break;
-                                    }
-                                    
-                                }
-
-                                way.Add(put, dasd);
-                                put++;
-                                
-                                used = used.Distinct().ToList();
-                            }
-                            //int eer = 0;
-                            //foreach (var item in way.Reverse())
-                            //{
-                                
-                            //}
-                            //int Redr(int router)
-                            //{
-                            //    if (message.NumberRouter == router)
-                            //    {
-
-                            //        return 1;
-                            //    }
-                            //    foreach (var item in routerMs[router].Target)
-                            //    {
-                            //        if (item != message.NumberRouter)
-                            //        {
-                            //            var asda = Redr(item);
-                            //            return ++asda;
-                            //        }
-                            //    }
-
-                            //    return default;
-                            //}
-
+                            var newRouterM = routerM.QueueMap.GetValueOrDefault(message.NumberRouter);
 
                             message.TimeOfProcessing += sw.Elapsed.TotalSeconds;
-                            Console.WriteLine($"Router {routerM.NumberRouter} stop message timeOfProcessing {message.TimeOfProcessing:F6}, to {message.NumberRouter}");
-                            routerMs[newtRouterM].AddMessage(message);
+                            //Console.WriteLine($"Router {routerM.NumberRouter} stop message timeOfProcessing {message.TimeOfProcessing:F6}, to {message.NumberRouter}");
+                            routerMs[newRouterM].AddMessage(message);
                         }
                         routerM.Queue.RemoveAt(0);
                     }
