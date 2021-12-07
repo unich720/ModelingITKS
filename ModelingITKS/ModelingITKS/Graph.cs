@@ -37,7 +37,7 @@ namespace GraphLabs
         public List<int> Target;
         public int TimeOfProcessing;
         public int QueueSize;
-        public List<Message> Queue;
+        public PriorityQueue Queue;
         public int timeSpawn;
         public Dictionary<int, int> QueueMap;
 
@@ -54,30 +54,31 @@ namespace GraphLabs
             this.max = max;
             this.timeSpawn = timeSpawn;
             Target = new List<int>();
-            Queue = new List<Message>(QueueSize);
+            Queue = new PriorityQueue();
             QueueMap = new Dictionary<int, int>();
         }
 
         public void AddMessage(Message message)
         {
-            if (Queue.Count != QueueSize)
-            {
-                Console.WriteLine($"Router { NumberRouter} add message { message.TimeOfProcessing:F6}, to { message.NumberRouter}");
-                Queue.Add(message);
-            }
-            else
-            {
-                var first = Queue.First();
-                if (first.Priority < message.Priority)
-                {
-                    Queue.RemoveAt(0);
-                    Console.WriteLine($"Queue is full. Router { NumberRouter} add message { message.TimeOfProcessing:F6}, to { message.NumberRouter}, delete last queue message { first.Priority} < { message.Priority}");
-                    Queue.Add(message);
-                }
+            Queue.AddMessage(message,NumberRouter);
+            //if (Queue.Count != QueueSize)
+            //{
+            //    Console.WriteLine($"Router { NumberRouter} add message { message.TimeOfProcessing:F6}, to { message.NumberRouter}");
+            //    Queue.Add(message);
+            //}
+            //else
+            //{
+            //    var first = Queue.First();
+            //    if (first.Priority < message.Priority)
+            //    {
+            //        Queue.RemoveAt(0);
+            //        Console.WriteLine($"Queue is full. Router { NumberRouter} add message { message.TimeOfProcessing:F6}, to { message.NumberRouter}, delete last queue message { first.Priority} < { message.Priority}");
+            //        Queue.Add(message);
+            //    }
 
-                Routing.CountLoseMessage++;
-            }
-            Queue = Queue.OrderBy(x => x.Priority).ToList();
+            //    Routing.CountLoseMessage++;
+            //}
+            //Queue = Queue.OrderBy(x => x.Priority).ToList();
         }
 
         public void AddTarget(int router)
@@ -96,8 +97,9 @@ namespace GraphLabs
                 {
                     AddMessage(new Message
                     {
+                        Guid= Guid.NewGuid(),
                         NumberRouter = rnd.Next(0, max),
-                        Priority = rnd.Next(1, 10),
+                        Priority = rnd.Next(0, 3),
                     });
                     await Task.Delay(TimeSpan.FromSeconds(timeSpawn));
                 }
@@ -154,10 +156,66 @@ namespace GraphLabs
 
     public class Message
     {
+        public Guid Guid { get; set; }
         public int NumberRouter { get; set; }
         public double TimeOfProcessing { get; set; }
         public bool IsDown { get; set; }
         public int Priority { get; set; }
+    }
+
+    public class PriorityQueue
+    {
+        private Dictionary<int, int> PriorityAmount;
+        private Dictionary<int, List<Message>> MessagesP;
+        public PriorityQueue()
+        {
+            Random rnd = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
+            PriorityAmount = new Dictionary<int, int>();
+            MessagesP= new Dictionary<int, List<Message>>();
+            int amount = 2;
+            for (int i = 0; i <= amount; i++)
+            {
+                PriorityAmount.Add(i, rnd.Next(2, 4));
+                MessagesP.Add(i,new List<Message>());
+            }
+        }
+        public List<Message> Messages => GetMessages();
+
+        private List<Message> GetMessages()
+        {
+            List<Message> messages = new List<Message>();
+            foreach (var item in MessagesP)
+            {
+                messages.AddRange(item.Value);
+            }
+
+            return messages;
+        }
+
+        public void DeleteMessage(Message message)
+        {
+            foreach (var item in MessagesP)
+            {
+                if (item.Value.Contains(message))
+                {
+                    item.Value.Remove(message);
+                }
+            }
+        }
+
+        public void AddMessage(Message message, int numberRouter)
+        {
+            var mes = MessagesP[message.Priority];
+            if (mes.Count < PriorityAmount[message.Priority])
+            {
+                mes.Add(message);
+            }
+            else
+            {
+                Routing.CountLoseMessage++;
+                Console.WriteLine($"Queue is full. Router { numberRouter} add message { message.TimeOfProcessing:F6}, to { message.NumberRouter},Priority { message.Priority}");
+            }
+        }
     }
 
 }

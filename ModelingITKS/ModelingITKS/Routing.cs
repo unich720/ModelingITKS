@@ -77,10 +77,10 @@ namespace ModelingITKS
         {
             while (!token.IsCancellationRequested)
             {
-                if (routerM.Queue.Any())
+                if (routerM.Queue.Messages.Any())
                 {
                     var sw = Stopwatch.StartNew();
-                    var message = routerM.Queue.First();
+                    var message = routerM.Queue.Messages.First();
                     if (message != null)
                     {
                         Console.WriteLine($"Router {routerM.NumberRouter} start message timeOfProcessing {message.TimeOfProcessing:F6}, to {message.NumberRouter}");
@@ -108,7 +108,7 @@ namespace ModelingITKS
                             Console.WriteLine($"Router {routerM.NumberRouter} stop message timeOfProcessing {message.TimeOfProcessing:F6}, to {message.NumberRouter}");
                             routerMs[newtRouterM].AddMessage(message);
                         }
-                        routerM.Queue.RemoveAt(0);
+                        routerM.Queue.Messages.RemoveAt(0);
                     }
                 }
             };
@@ -119,10 +119,10 @@ namespace ModelingITKS
         {
             while (!token.IsCancellationRequested)
             {
-                if (routerM.Queue.Any())
+                if (routerM.Queue.Messages.Any())
                 {
                     var sw = Stopwatch.StartNew();
-                    var message = routerM.Queue.First();
+                    var message = routerM.Queue.Messages.First();
                     if (message != null)
                     {
                         Console.WriteLine($"Router {routerM.NumberRouter} start message timeOfProcessing {message.TimeOfProcessing:F6}, to {message.NumberRouter}");
@@ -154,7 +154,7 @@ namespace ModelingITKS
                             Console.WriteLine($"Router {routerM.NumberRouter} stop message timeOfProcessing {message.TimeOfProcessing:F6}, to {newtRouterM}");
                             routerMs[newtRouterM].AddMessage(message);
                         }
-                        routerM.Queue.RemoveAt(0);
+                        routerM.Queue.Messages.RemoveAt(0);
                     }
                 }
             };
@@ -213,10 +213,10 @@ namespace ModelingITKS
         {
             while (!token.IsCancellationRequested)
             {
-                if (routerM.Queue.Any())
+                if (routerM.Queue.Messages.Any())
                 {
                     var sw = Stopwatch.StartNew();
-                    var message = routerM.Queue.First();
+                    var message = routerM.Queue.Messages.First();
                     if (message != null)
                     {
                         //Console.WriteLine($"Router {routerM.NumberRouter} start message timeOfProcessing {message.TimeOfProcessing:F6}, to {message.NumberRouter}");
@@ -238,7 +238,7 @@ namespace ModelingITKS
                             //Console.WriteLine($"Router {routerM.NumberRouter} stop message timeOfProcessing {message.TimeOfProcessing:F6}, to {message.NumberRouter}");
                             routerMs[newRouterM].AddMessage(message);
                         }
-                        routerM.Queue.RemoveAt(0);
+                        routerM.Queue.DeleteMessage(message);
                     }
                 }
             };
