@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TakeGrant", "TakeGrant\TakeGrant.csproj", "{24554DAD-5BEB-482D-A0BA-A48CB838C25D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24554DAD-5BEB-482D-A0BA-A48CB838C25D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24554DAD-5BEB-482D-A0BA-A48CB838C25D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24554DAD-5BEB-482D-A0BA-A48CB838C25D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24554DAD-5BEB-482D-A0BA-A48CB838C25D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3CB0BC97-5BAE-41D5-B73A-44FA2381572C}
+	EndGlobalSection
+EndGlobal
