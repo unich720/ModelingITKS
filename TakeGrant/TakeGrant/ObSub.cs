@@ -37,6 +37,11 @@ namespace TakeGrant
         {
             Transitions.AddRange(transition);
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     public class Object : Entity
@@ -50,6 +55,8 @@ namespace TakeGrant
     public enum ActionEnum
     {
         Take = 1,
-        Grand
+        Grand,
+        Read,
+        Write
     }
 }
