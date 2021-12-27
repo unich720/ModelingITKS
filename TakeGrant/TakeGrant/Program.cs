@@ -90,10 +90,10 @@ namespace TakeGrant
             transitions.Add(new Transition(entities.First(x => x.Name == "s4"), entities.First(x => x.Name == "o1"), ActionEnum.Take));
 
             //case1
-            //transitions.Add(new Transition(entities.First(x => x.Name == "o1"), entities.First(x => x.Name == "s1"), ActionEnum.Take));
+            transitions.Add(new Transition(entities.First(x => x.Name == "o1"), entities.First(x => x.Name == "s1"), ActionEnum.Take));
 
             //grant
-            //transitions.Add(new Transition(entities.First(x => x.Name == "s4"), entities.First(x => x.Name == "o3"), ActionEnum.Grand));
+            transitions.Add(new Transition(entities.First(x => x.Name == "s4"), entities.First(x => x.Name == "o3"), ActionEnum.Grand));
 
             return transitions;
         }
